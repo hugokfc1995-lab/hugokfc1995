@@ -26,6 +26,8 @@ const ADMIN_TIMEOUT_MS = 10 * 60 * 1000;
 const ADMIN_WARN_MS = 2 * 60 * 1000;
 const MAX_GALLERY_ITEMS = 60;
 const GALLERY_PAGE_SIZE = 8;
+const CALENDAR_ICS_URL =
+  'https://calendar.google.com/calendar/ical/hugokfc1995%40gmail.com/public/basic.ics';
 const formatDateCaption = (filename) => {
   const base = filename.replace(/\.[^/.]+$/, '');
   if (/^\d{8}_/.test(base)) {
@@ -44,6 +46,99 @@ const formatDateCaption = (filename) => {
     }
   }
   return '0000년 00월 00일';
+};
+
+const formatKstDate = (date) => {
+  return new Intl.DateTimeFormat('ko-KR', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  })
+    .format(date)
+    .replace(/\. /g, '.')
+    .replace(/\.$/, '');
+};
+
+const formatKstTime = (date) => {
+  return new Intl.DateTimeFormat('ko-KR', {
+    timeZone: 'Asia/Seoul',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(date);
+};
+
+const parseIcsDate = (value) => {
+  if (!value) return null;
+  const isUtc = value.endsWith('Z');
+  const clean = value.replace('Z', '');
+  const datePart = clean.split('T')[0];
+  const timePart = clean.split('T')[1] || '000000';
+  const year = Number(datePart.slice(0, 4));
+  const month = Number(datePart.slice(4, 6)) - 1;
+  const day = Number(datePart.slice(6, 8));
+  const hour = Number(timePart.slice(0, 2));
+  const minute = Number(timePart.slice(2, 4));
+  const second = Number(timePart.slice(4, 6));
+  if ([year, month, day].some((n) => Number.isNaN(n))) return null;
+  if (isUtc) {
+    return new Date(Date.UTC(year, month, day, hour, minute, second));
+  }
+  return new Date(year, month, day, hour, minute, second);
+};
+
+const extractOpponent = (summary) => {
+  if (!summary) return '-';
+  const normalized = summary.replace(/\s+/g, ' ').trim();
+  const vsIndex = normalized.toLowerCase().indexOf('vs');
+  if (vsIndex === -1) return normalized.replace('후곡', '').trim() || normalized;
+  const after = normalized.slice(vsIndex + 2).replace(/[:\-]/g, '').trim();
+  return after.replace('후곡', '').trim() || after || '-';
+};
+
+const fetchWeeklySchedule = async () => {
+  if (!scheduleDateEl || !scheduleTimeEl || !schedulePlaceEl || !scheduleOpponentEl) return;
+  try {
+    const res = await fetch(CALENDAR_ICS_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error('calendar fetch failed');
+    const text = await res.text();
+    const unfolded = text.replace(/\r?\n[ \t]/g, '');
+    const events = unfolded.split('BEGIN:VEVENT').slice(1).map((chunk) => {
+      const end = chunk.split('END:VEVENT')[0];
+      const lines = end.split(/\r?\n/);
+      const getLine = (prefix) => {
+        const line = lines.find((l) => l.startsWith(prefix));
+        return line ? line.slice(prefix.length) : '';
+      };
+      const dtStartLine = lines.find((l) => l.startsWith('DTSTART'));
+      const dtEndLine = lines.find((l) => l.startsWith('DTEND'));
+      const summary = getLine('SUMMARY:');
+      const dtStartValue = dtStartLine ? dtStartLine.split(':').pop() : '';
+      const dtEndValue = dtEndLine ? dtEndLine.split(':').pop() : '';
+      return {
+        summary,
+        start: parseIcsDate(dtStartValue),
+        end: parseIcsDate(dtEndValue),
+      };
+    });
+    const now = new Date();
+    const upcoming = events
+      .filter((evt) => evt.start instanceof Date && evt.start >= now)
+      .sort((a, b) => a.start - b.start);
+    const next = upcoming[0];
+    if (!next) return;
+    scheduleDateEl.textContent = formatKstDate(next.start);
+    if (next.end) {
+      scheduleTimeEl.textContent = `${formatKstTime(next.start)} ~ ${formatKstTime(next.end)}`;
+    } else {
+      scheduleTimeEl.textContent = formatKstTime(next.start);
+    }
+    schedulePlaceEl.textContent = '조리체육공원';
+    scheduleOpponentEl.textContent = extractOpponent(next.summary);
+  } catch {
+    // leave placeholders
+  }
 };
 
 const DEFAULT_GALLERY_FILES = [
@@ -133,6 +228,10 @@ const logoutTopBtn = document.querySelector('#admin-logout-top');
 const remainingEl = document.querySelector('#admin-logout-top');
 const galleryGrid = document.querySelector('#gallery-grid');
 const galleryPagination = document.querySelector('#gallery-pagination');
+const scheduleDateEl = document.querySelector('#schedule-date');
+const scheduleTimeEl = document.querySelector('#schedule-time');
+const schedulePlaceEl = document.querySelector('#schedule-place');
+const scheduleOpponentEl = document.querySelector('#schedule-opponent');
 const photoForm = document.querySelector('#gallery-form');
 const photoList = document.querySelector('#gallery-list');
 const clearGalleryBtn = document.querySelector('#clear-gallery');
@@ -669,6 +768,7 @@ updateAdminUI();
 renderMembers();
 renderGallery();
 renderGalleryAdmin();
+fetchWeeklySchedule();
 guardAdminNavLinks();
 enforceAdminAccess();
 
