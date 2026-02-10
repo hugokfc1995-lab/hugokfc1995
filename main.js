@@ -437,9 +437,15 @@ const scheduleSessionTimers = () => {
   }, remaining);
 };
 
-const handleActivity = () => {
+const handleActivity = (event) => {
   if (!isAdmin()) return;
   if (!document.body.classList.contains('admin-page')) return;
+  if (event && event.type === 'click') {
+    const target = event.target;
+    if (target instanceof Element && target.closest('a[href]')) {
+      return;
+    }
+  }
   setLastActive();
   scheduleSessionTimers();
 };
