@@ -25,10 +25,20 @@ const ADMIN_LAST_ACTIVE_KEY = 'hugok_admin_last_active';
 const ADMIN_TIMEOUT_MS = 10 * 60 * 1000;
 const ADMIN_WARN_MS = 2 * 60 * 1000;
 const MAX_GALLERY_ITEMS = 16;
-const DEFAULT_PHOTOS = Array.from({ length: 16 }, (_, index) => ({
-  url: `images/gallery/gallery-${String(index + 1).padStart(2, '0')}.svg`,
-  caption: `활동 스냅 ${index + 1}`,
-}));
+const DEFAULT_PHOTOS = [
+  { url: 'images/gallery/20250202_084850.jpg', caption: '활동 스냅 1' },
+  { url: 'images/gallery/20250608_162605.jpg', caption: '활동 스냅 2' },
+  { url: 'images/gallery/20250608_163300.jpg', caption: '활동 스냅 3' },
+  { url: 'images/gallery/20251102_191315.jpg', caption: '활동 스냅 4' },
+  { url: 'images/gallery/20260125_100051.jpg', caption: '활동 스냅 5' },
+  { url: 'images/gallery/20260125_100102.jpg', caption: '활동 스냅 6' },
+  { url: 'images/gallery/20260125_100108.jpg', caption: '활동 스냅 7' },
+  { url: 'images/gallery/20260125_100306.jpg', caption: '활동 스냅 8' },
+  ...Array.from({ length: 8 }, (_, index) => ({
+    url: `images/gallery/gallery-${String(index + 1).padStart(2, '0')}.svg`,
+    caption: `활동 스냅 ${index + 9}`,
+  })),
+];
 
 const loginForm = document.querySelector('#admin-login-form');
 const memberForm = document.querySelector('#member-form');
