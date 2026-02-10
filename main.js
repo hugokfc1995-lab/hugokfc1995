@@ -35,7 +35,7 @@ const memberForm = document.querySelector('#member-form');
 const memberList = document.querySelector('#member-list');
 const logoutBtn = document.querySelector('#admin-logout');
 const logoutTopBtn = document.querySelector('#admin-logout-top');
-const remainingEl = document.querySelector('#admin-remaining');
+const remainingEl = document.querySelector('#admin-logout-top');
 const galleryGrid = document.querySelector('#gallery-grid');
 const photoForm = document.querySelector('#gallery-form');
 const photoList = document.querySelector('#gallery-list');
@@ -185,7 +185,7 @@ const updateRemainingUI = () => {
     remainingEl.style.display = 'none';
     return;
   }
-  remainingEl.textContent = `남은시간 ${formatRemaining(getRemainingMs())}`;
+  remainingEl.textContent = `로그아웃 (${formatRemaining(getRemainingMs())})`;
   remainingEl.style.display = 'inline-flex';
 };
 
