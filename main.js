@@ -97,12 +97,19 @@ const extractOpponent = (summary) => {
   return after.replace('후곡', '').trim() || after || '-';
 };
 
+const fetchIcsText = async () => {
+  const direct = await fetch(CALENDAR_ICS_URL, { cache: 'no-store' });
+  if (direct.ok) return direct.text();
+  const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(CALENDAR_ICS_URL)}`;
+  const proxy = await fetch(proxyUrl, { cache: 'no-store' });
+  if (!proxy.ok) throw new Error('calendar fetch failed');
+  return proxy.text();
+};
+
 const fetchWeeklySchedule = async () => {
   if (!scheduleDateEl || !scheduleTimeEl || !schedulePlaceEl || !scheduleOpponentEl) return;
   try {
-    const res = await fetch(CALENDAR_ICS_URL, { cache: 'no-store' });
-    if (!res.ok) throw new Error('calendar fetch failed');
-    const text = await res.text();
+    const text = await fetchIcsText();
     const unfolded = text.replace(/\r?\n[ \t]/g, '');
     const events = unfolded.split('BEGIN:VEVENT').slice(1).map((chunk) => {
       const end = chunk.split('END:VEVENT')[0];
@@ -137,7 +144,10 @@ const fetchWeeklySchedule = async () => {
     schedulePlaceEl.textContent = '조리체육공원';
     scheduleOpponentEl.textContent = extractOpponent(next.summary);
   } catch {
-    // leave placeholders
+    scheduleDateEl.textContent = '일정 확인 불가';
+    scheduleTimeEl.textContent = '-';
+    schedulePlaceEl.textContent = '조리체육공원';
+    scheduleOpponentEl.textContent = '-';
   }
 };
 
