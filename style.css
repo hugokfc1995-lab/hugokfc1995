@@ -311,6 +311,29 @@ a {
   box-shadow: var(--shadow);
 }
 
+.rules-meta {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.rules-doc {
+  background: var(--card);
+  border-radius: 18px;
+  border: 1px solid rgba(26, 26, 26, 0.08);
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+
+.rules-pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
 .recruit-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
