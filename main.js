@@ -24,17 +24,65 @@ const PHOTOS_KEY = 'hugok_gallery_photos';
 const ADMIN_LAST_ACTIVE_KEY = 'hugok_admin_last_active';
 const ADMIN_TIMEOUT_MS = 10 * 60 * 1000;
 const ADMIN_WARN_MS = 2 * 60 * 1000;
-const MAX_GALLERY_ITEMS = 16;
-const DEFAULT_PHOTOS = [
-  { url: 'images/gallery/20250202_084850.jpg', caption: '새벽 체육공원 단체샷' },
-  { url: 'images/gallery/20250608_162605.jpg', caption: '여름 오후 워밍업' },
-  { url: 'images/gallery/20250608_163300.jpg', caption: '패스 훈련 집중 타임' },
-  { url: 'images/gallery/20251102_191315.jpg', caption: '가을 야간 경기 스냅' },
-  { url: 'images/gallery/20260125_100051.jpg', caption: '겨울 오전 킥오프' },
-  { url: 'images/gallery/20260125_100102.jpg', caption: '라인 정비와 수비 훈련' },
-  { url: 'images/gallery/20260125_100108.jpg', caption: '팀워크 체크 전술 미팅' },
-  { url: 'images/gallery/20260125_100306.jpg', caption: '훈련 마무리 하이파이브' },
+const MAX_GALLERY_ITEMS = 60;
+const formatDateCaption = (filename) => {
+  const base = filename.replace(/\.[^/.]+$/, '');
+  if (/^\d{8}_/.test(base)) {
+    const year = base.slice(0, 4);
+    const month = base.slice(4, 6);
+    const day = base.slice(6, 8);
+    return `${year}년 ${month}월 ${day}일`;
+  }
+  if (/^\d{13}$/.test(base)) {
+    const date = new Date(Number(base));
+    if (!Number.isNaN(date.getTime())) {
+      const year = String(date.getFullYear());
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}년 ${month}월 ${day}일`;
+    }
+  }
+  return '0000년 00월 00일';
+};
+
+const DEFAULT_GALLERY_FILES = [
+  '1770724491236.jpg',
+  '1770724504135.jpg',
+  '1770724504230.jpg',
+  '1770724512516.jpg',
+  '1770724523734.jpg',
+  '1770724523814.jpg',
+  '1770724553533.jpg',
+  '1770724553596.jpg',
+  '1770724553656.jpg',
+  '1770724554176.jpg',
+  '1770724554235.jpg',
+  '1770724554401.jpg',
+  '1770724554449.jpg',
+  '1770724554522.jpg',
+  '1770724554573.jpg',
+  '1770724554624.jpg',
+  '1770724554699.jpg',
+  '1770724554757.jpg',
+  '1770724554817.jpg',
+  '1770724554878.jpg',
+  '1770724554949.jpg',
+  '1770724555067.jpg',
+  '1770724555276.jpg',
+  '20250202_084850.jpg',
+  '20250608_162605.jpg',
+  '20250608_163300.jpg',
+  '20251102_191315.jpg',
+  '20260125_100051.jpg',
+  '20260125_100102.jpg',
+  '20260125_100108.jpg',
+  '20260125_100306.jpg',
 ];
+
+const DEFAULT_PHOTOS = DEFAULT_GALLERY_FILES.map((file) => ({
+  url: `images/gallery/${file}`,
+  caption: formatDateCaption(file),
+}));
 
 const loginForm = document.querySelector('#admin-login-form');
 const memberForm = document.querySelector('#member-form');
