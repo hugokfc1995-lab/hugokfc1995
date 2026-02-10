@@ -371,6 +371,34 @@ a {
   justify-content: center;
 }
 
+.gallery-pagination {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.gallery-page-btn {
+  border: 1px solid rgba(26, 26, 26, 0.2);
+  background: #fff;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.gallery-page-btn[aria-current='page'] {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.gallery-page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .gallery-item {
   position: relative;
   overflow: hidden;

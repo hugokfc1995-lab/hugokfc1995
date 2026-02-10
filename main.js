@@ -307,12 +307,14 @@ const renderGalleryPagination = (total) => {
   const buttons = [];
   const prevDisabled = galleryCurrentPage === 1 ? 'disabled' : '';
   const nextDisabled = galleryCurrentPage === totalPages ? 'disabled' : '';
-  buttons.push(`<button type="button" data-page="prev" ${prevDisabled}>이전</button>`);
+  buttons.push(`<button type="button" class="gallery-page-btn" data-page="prev" ${prevDisabled}>이전</button>`);
   for (let page = 1; page <= totalPages; page += 1) {
     const active = page === galleryCurrentPage ? 'aria-current="page"' : '';
-    buttons.push(`<button type="button" data-page="${page}" ${active}>${page}</button>`);
+    buttons.push(
+      `<button type="button" class="gallery-page-btn" data-page="${page}" ${active}>${page}</button>`,
+    );
   }
-  buttons.push(`<button type="button" data-page="next" ${nextDisabled}>다음</button>`);
+  buttons.push(`<button type="button" class="gallery-page-btn" data-page="next" ${nextDisabled}>다음</button>`);
   galleryPagination.innerHTML = buttons.join('');
 };
 
