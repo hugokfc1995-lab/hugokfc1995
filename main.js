@@ -323,6 +323,9 @@ if (logoutBtn) {
   logoutBtn.addEventListener('click', () => {
     setAdminState(false);
     updateAdminUI();
+    if (document.body.classList.contains('admin-page')) {
+      window.location.href = '/index.html';
+    }
   });
 }
 
@@ -330,6 +333,9 @@ if (logoutTopBtn) {
   logoutTopBtn.addEventListener('click', () => {
     setAdminState(false);
     updateAdminUI();
+    if (document.body.classList.contains('admin-page')) {
+      window.location.href = '/index.html';
+    }
   });
 }
 
