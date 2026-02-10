@@ -441,6 +441,7 @@ const scheduleSessionTimers = () => {
 
 const handleActivity = () => {
   if (!isAdmin()) return;
+  if (!document.body.classList.contains('admin-page')) return;
   setLastActive();
   scheduleSessionTimers();
 };
