@@ -757,8 +757,10 @@ if (galleryGrid) {
 if (galleryPagination) {
   galleryPagination.addEventListener('click', (event) => {
     const target = event.target;
-    if (!(target instanceof HTMLButtonElement)) return;
-    const value = target.dataset.page;
+    if (!(target instanceof Element)) return;
+    const button = target.closest('button[data-page]');
+    if (!button || !(button instanceof HTMLButtonElement)) return;
+    const value = button.dataset.page;
     if (!value) return;
     const items = getGalleryItems();
     const totalPages = Math.max(1, Math.ceil(items.length / GALLERY_PAGE_SIZE));
