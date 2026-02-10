@@ -25,7 +25,7 @@ const ADMIN_LAST_ACTIVE_KEY = 'hugok_admin_last_active';
 const ADMIN_TIMEOUT_MS = 10 * 60 * 1000;
 const ADMIN_WARN_MS = 2 * 60 * 1000;
 const MAX_GALLERY_ITEMS = 60;
-const GALLERY_PAGE_SIZE = 16;
+const GALLERY_PAGE_SIZE = 8;
 const formatDateCaption = (filename) => {
   const base = filename.replace(/\.[^/.]+$/, '');
   if (/^\d{8}_/.test(base)) {
