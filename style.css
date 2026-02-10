@@ -24,6 +24,10 @@ body {
   color: var(--text);
   line-height: 1.6;
   scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-synthesis: none;
 }
 
 a {
@@ -239,6 +243,7 @@ a {
 .card-grid strong {
   display: block;
   font-size: 18px;
+  font-weight: 600;
   margin-top: 4px;
 }
 
@@ -275,6 +280,13 @@ a {
   padding: 18px;
   border-radius: 14px;
   border: 1px solid rgba(26, 26, 26, 0.08);
+}
+
+.info-item h3,
+.rule-card h3,
+.recruit-box h3,
+.contact-card h3 {
+  font-weight: 600;
 }
 
 .rules {
