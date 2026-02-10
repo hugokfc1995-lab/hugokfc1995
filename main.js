@@ -205,7 +205,7 @@ const renderGallery = () => {
     item.dataset.index = String(index);
     item.innerHTML = `
       <img src="${photo.url}" alt="${photo.caption}" loading="lazy" />
-      <span>${photo.caption}</span>
+      <span class="gallery-caption" data-index="${index}">${photo.caption}</span>
     `;
     galleryGrid.appendChild(item);
   });
@@ -588,6 +588,35 @@ if (galleryGrid) {
   galleryGrid.addEventListener('click', (event) => {
     const target = event.target;
     if (!(target instanceof Element)) return;
+    if (target.classList.contains('gallery-caption')) {
+      if (!isAdmin()) {
+        alert('관리자 로그인 후 수정 가능합니다.');
+        return;
+      }
+      const index = Number(target.dataset.index);
+      if (!Number.isInteger(index)) return;
+      const items = getGalleryItems();
+      const current = items[index];
+      if (!current) return;
+      const nextCaption = prompt('캡션을 수정해 주세요.', current.caption);
+      if (nextCaption === null) return;
+      const trimmed = String(nextCaption).trim();
+      if (!trimmed) {
+        alert('캡션을 입력해 주세요.');
+        return;
+      }
+      const photos = loadPhotos();
+      if (photos.length === 0) {
+        photos.push(...items.map((item) => ({ ...item })));
+      }
+      if (!photos[index]) return;
+      photos[index].caption = trimmed;
+      savePhotos(photos);
+      renderGalleryAdmin();
+      renderGallery();
+      setLastActive();
+      return;
+    }
     const item = target.closest('.gallery-item');
     if (!item || !galleryGrid.contains(item)) return;
     const index = Number(item.dataset.index);
