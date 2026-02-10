@@ -371,6 +371,64 @@ a {
   font-size: 13px;
 }
 
+.gallery-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+}
+
+.gallery-modal.open {
+  display: block;
+}
+
+.gallery-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.gallery-modal-content {
+  position: relative;
+  max-width: min(92vw, 1100px);
+  max-height: 88vh;
+  margin: 6vh auto 0;
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px 16px 12px;
+  display: grid;
+  gap: 10px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+}
+
+.gallery-modal-content img {
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #111;
+}
+
+.gallery-modal-caption {
+  margin: 0;
+  color: rgba(26, 26, 26, 0.75);
+  font-size: 14px;
+}
+
+.gallery-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  border: 1px solid rgba(26, 26, 26, 0.2);
+  background: #fff;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 12px;
+}
+
 .contact-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

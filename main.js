@@ -168,9 +168,10 @@ const renderGallery = () => {
   if (!galleryGrid) return;
   const items = getGalleryItems();
   galleryGrid.innerHTML = '';
-  items.forEach((photo) => {
+  items.forEach((photo, index) => {
     const item = document.createElement('div');
     item.className = 'gallery-item';
+    item.dataset.index = String(index);
     item.innerHTML = `
       <img src="${photo.url}" alt="${photo.caption}" loading="lazy" />
       <span>${photo.caption}</span>
@@ -509,6 +510,75 @@ renderMembers();
 renderGallery();
 renderGalleryAdmin();
 enforceAdminAccess();
+
+let galleryModal;
+const ensureGalleryModal = () => {
+  if (galleryModal) return galleryModal;
+  const modal = document.createElement('div');
+  modal.className = 'gallery-modal';
+  modal.setAttribute('aria-hidden', 'true');
+  modal.innerHTML = `
+    <div class="gallery-modal-backdrop" data-close="true"></div>
+    <div class="gallery-modal-content" role="dialog" aria-modal="true">
+      <button class="gallery-modal-close" type="button" aria-label="닫기" data-close="true">닫기</button>
+      <img alt="" />
+      <p class="gallery-modal-caption"></p>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  galleryModal = modal;
+  return modal;
+};
+
+const openGalleryModal = (photo) => {
+  if (!photo) return;
+  const modal = ensureGalleryModal();
+  const image = modal.querySelector('img');
+  const caption = modal.querySelector('.gallery-modal-caption');
+  if (image) {
+    image.src = photo.url;
+    image.alt = photo.caption;
+  }
+  if (caption) {
+    caption.textContent = photo.caption;
+  }
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+};
+
+const closeGalleryModal = () => {
+  if (!galleryModal) return;
+  galleryModal.classList.remove('open');
+  galleryModal.setAttribute('aria-hidden', 'true');
+};
+
+if (galleryGrid) {
+  galleryGrid.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const item = target.closest('.gallery-item');
+    if (!item || !galleryGrid.contains(item)) return;
+    const index = Number(item.dataset.index);
+    if (!Number.isInteger(index)) return;
+    const items = getGalleryItems();
+    openGalleryModal(items[index]);
+  });
+}
+
+document.addEventListener('click', (event) => {
+  const target = event.target;
+  if (!(target instanceof Element)) return;
+  if (!galleryModal) return;
+  if (!galleryModal.classList.contains('open')) return;
+  if (target.dataset.close === 'true') {
+    closeGalleryModal();
+  }
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape') return;
+  closeGalleryModal();
+});
 
 const logoutDueToTimeout = () => {
   setAdminState(false);
