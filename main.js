@@ -78,6 +78,14 @@ const setAdminState = (loggedIn) => {
 
 const isAdmin = () => localStorage.getItem(ADMIN_KEY) === 'true';
 
+const enforceAdminAccess = () => {
+  if (!document.body.classList.contains('admin-page')) return;
+  const path = window.location.pathname;
+  if (isAdmin()) return;
+  if (path.endsWith('/admin.html') || path.endsWith('admin.html')) return;
+  window.location.href = '/admin.html';
+};
+
 const setLastActive = () => {
   localStorage.setItem(ADMIN_LAST_ACTIVE_KEY, String(Date.now()));
 };
@@ -500,6 +508,7 @@ updateAdminUI();
 renderMembers();
 renderGallery();
 renderGalleryAdmin();
+enforceAdminAccess();
 
 const logoutDueToTimeout = () => {
   setAdminState(false);
