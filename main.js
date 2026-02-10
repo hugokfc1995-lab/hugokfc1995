@@ -26,7 +26,7 @@ const ADMIN_TIMEOUT_MS = 10 * 60 * 1000;
 const ADMIN_WARN_MS = 2 * 60 * 1000;
 const MAX_GALLERY_ITEMS = 16;
 const DEFAULT_PHOTOS = Array.from({ length: 16 }, (_, index) => ({
-  url: `https://picsum.photos/seed/hugok-${index + 1}/800/600`,
+  url: `images/gallery/gallery-${String(index + 1).padStart(2, '0')}.svg`,
   caption: `활동 스냅 ${index + 1}`,
 }));
 
