@@ -20,9 +20,15 @@ const DEFAULT_ADMIN_PASS = '1234';
 const ADMIN_KEY = 'hugok_admin_logged_in';
 const ADMIN_PASS_KEY = 'hugok_admin_password';
 const MEMBERS_KEY = 'hugok_members';
+const PHOTOS_KEY = 'hugok_gallery_photos';
 const ADMIN_LAST_ACTIVE_KEY = 'hugok_admin_last_active';
 const ADMIN_TIMEOUT_MS = 10 * 60 * 1000;
 const ADMIN_WARN_MS = 2 * 60 * 1000;
+const MAX_GALLERY_ITEMS = 16;
+const DEFAULT_PHOTOS = Array.from({ length: 16 }, (_, index) => ({
+  url: `https://picsum.photos/seed/hugok-${index + 1}/800/600`,
+  caption: `활동 스냅 ${index + 1}`,
+}));
 
 const loginForm = document.querySelector('#admin-login-form');
 const memberForm = document.querySelector('#member-form');
@@ -30,6 +36,10 @@ const memberList = document.querySelector('#member-list');
 const logoutBtn = document.querySelector('#admin-logout');
 const logoutTopBtn = document.querySelector('#admin-logout-top');
 const remainingEl = document.querySelector('#admin-remaining');
+const galleryGrid = document.querySelector('#gallery-grid');
+const photoForm = document.querySelector('#gallery-form');
+const photoList = document.querySelector('#gallery-list');
+const clearGalleryBtn = document.querySelector('#clear-gallery');
 const clearBtn = document.querySelector('#clear-members');
 const passwordForm = document.querySelector('#admin-password-form');
 
@@ -67,6 +77,18 @@ const saveMembers = (members) => {
   localStorage.setItem(MEMBERS_KEY, JSON.stringify(members));
 };
 
+const loadPhotos = () => {
+  try {
+    return JSON.parse(localStorage.getItem(PHOTOS_KEY) || '[]');
+  } catch {
+    return [];
+  }
+};
+
+const savePhotos = (photos) => {
+  localStorage.setItem(PHOTOS_KEY, JSON.stringify(photos));
+};
+
 const renderMembers = () => {
   if (!memberList) return;
   const members = loadMembers();
@@ -86,6 +108,58 @@ const renderMembers = () => {
       <span>가입일: ${member.joined}</span>
     `;
     memberList.appendChild(item);
+  });
+};
+
+const getGalleryItems = () => {
+  const saved = loadPhotos();
+  if (saved.length === 0) return DEFAULT_PHOTOS.slice(0, MAX_GALLERY_ITEMS);
+  const merged = saved.slice(0, MAX_GALLERY_ITEMS);
+  if (merged.length < MAX_GALLERY_ITEMS) {
+    merged.push(...DEFAULT_PHOTOS.slice(0, MAX_GALLERY_ITEMS - merged.length));
+  }
+  return merged;
+};
+
+const renderGallery = () => {
+  if (!galleryGrid) return;
+  const items = getGalleryItems();
+  galleryGrid.innerHTML = '';
+  items.forEach((photo) => {
+    const item = document.createElement('div');
+    item.className = 'gallery-item';
+    item.innerHTML = `
+      <img src="${photo.url}" alt="${photo.caption}" loading="lazy" />
+      <span>${photo.caption}</span>
+    `;
+    galleryGrid.appendChild(item);
+  });
+};
+
+const renderGalleryAdmin = () => {
+  if (!photoList) return;
+  const photos = loadPhotos();
+  photoList.innerHTML = '';
+  if (photos.length === 0) {
+    const empty = document.createElement('li');
+    empty.textContent = '등록된 사진이 없습니다.';
+    photoList.appendChild(empty);
+    return;
+  }
+  photos.forEach((photo, index) => {
+    const item = document.createElement('li');
+    item.className = 'gallery-admin-item';
+    item.innerHTML = `
+      <img class="gallery-admin-thumb" src="${photo.url}" alt="${photo.caption}" loading="lazy" />
+      <div class="gallery-admin-meta">
+        <strong>${photo.caption}</strong>
+        <span>${photo.url}</span>
+      </div>
+      <div class="gallery-admin-actions">
+        <button class="gallery-admin-remove" type="button" data-index="${index}">삭제</button>
+      </div>
+    `;
+    photoList.appendChild(item);
   });
 };
 
@@ -186,6 +260,65 @@ if (memberForm) {
   });
 }
 
+if (photoForm) {
+  photoForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!isAdmin()) {
+      alert('관리자 로그인 후 등록 가능합니다.');
+      return;
+    }
+    const form = new FormData(photoForm);
+    const url = String(form.get('photoUrl') || '').trim();
+    const caption = String(form.get('caption') || '').trim();
+    if (!url || !caption) {
+      alert('사진 URL과 캡션을 입력해 주세요.');
+      return;
+    }
+    const photos = loadPhotos();
+    photos.unshift({ url, caption });
+    savePhotos(photos);
+    photoForm.reset();
+    renderGalleryAdmin();
+    renderGallery();
+    setLastActive();
+  });
+}
+
+if (photoList) {
+  photoList.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    if (!target.classList.contains('gallery-admin-remove')) return;
+    if (!isAdmin()) {
+      alert('관리자 로그인 후 사용 가능합니다.');
+      return;
+    }
+    const index = Number(target.dataset.index);
+    if (!Number.isInteger(index)) return;
+    const photos = loadPhotos();
+    photos.splice(index, 1);
+    savePhotos(photos);
+    renderGalleryAdmin();
+    renderGallery();
+    setLastActive();
+  });
+}
+
+if (clearGalleryBtn) {
+  clearGalleryBtn.addEventListener('click', () => {
+    if (!isAdmin()) {
+      alert('관리자 로그인 후 사용 가능합니다.');
+      return;
+    }
+    if (confirm('갤러리 사진을 모두 삭제할까요?')) {
+      savePhotos([]);
+      renderGalleryAdmin();
+      renderGallery();
+      setLastActive();
+    }
+  });
+}
+
 if (logoutBtn) {
   logoutBtn.addEventListener('click', () => {
     setAdminState(false);
@@ -250,6 +383,8 @@ if (passwordForm) {
 
 updateAdminUI();
 renderMembers();
+renderGallery();
+renderGalleryAdmin();
 
 const logoutDueToTimeout = () => {
   setAdminState(false);

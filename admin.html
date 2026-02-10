@@ -84,6 +84,26 @@
             <button id="clear-members" class="btn ghost" type="button">목록 초기화</button>
           </div>
         </div>
+        <div class="admin-grid admin-gallery">
+          <form id="gallery-form" class="form-card" autocomplete="off">
+            <h3>활동 사진 등록</h3>
+            <label>
+              사진 URL
+              <input type="url" name="photoUrl" placeholder="https://example.com/photo.jpg" required />
+            </label>
+            <label>
+              캡션
+              <input type="text" name="caption" placeholder="간단한 설명" required />
+            </label>
+            <button class="btn primary" type="submit">사진 추가</button>
+            <p class="form-hint">등록된 사진은 갤러리에 최대 16장까지 노출됩니다.</p>
+          </form>
+          <div class="info-card">
+            <h3>등록된 사진</h3>
+            <ul id="gallery-list" class="gallery-admin-list"></ul>
+            <button id="clear-gallery" class="btn ghost" type="button">사진 전체 삭제</button>
+          </div>
+        </div>
         <div class="admin-grid admin-password">
           <form id="admin-password-form" class="form-card" autocomplete="off">
             <h3>관리자 비밀번호 변경</h3>
