@@ -45,7 +45,13 @@
             </label>
             <label>
               포지션
-              <input type="text" name="position" placeholder="FW / MF / DF / GK" required />
+              <select name="position" required>
+                <option value="" disabled selected>포지션 선택</option>
+                <option value="FW">FW</option>
+                <option value="MF">MF</option>
+                <option value="DF">DF</option>
+                <option value="GK">GK</option>
+              </select>
             </label>
             <label>
               가입일

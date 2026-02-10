@@ -32,6 +32,7 @@ const DEFAULT_PHOTOS = Array.from({ length: 16 }, (_, index) => ({
 
 const loginForm = document.querySelector('#admin-login-form');
 const memberForm = document.querySelector('#member-form');
+const memberSubmitBtn = memberForm ? memberForm.querySelector('button[type="submit"]') : null;
 const memberList = document.querySelector('#member-list');
 const logoutBtn = document.querySelector('#admin-logout');
 const logoutTopBtn = document.querySelector('#admin-logout-top');
@@ -43,6 +44,13 @@ const clearGalleryBtn = document.querySelector('#clear-gallery');
 const clearBtn = document.querySelector('#clear-members');
 const passwordForm = document.querySelector('#admin-password-form');
 let editingMemberIndex = null;
+const MEMBER_SUBMIT_DEFAULT = '회원 등록';
+const MEMBER_SUBMIT_EDITING = '수정 완료';
+
+const setMemberEditMode = (isEditing) => {
+  if (!memberSubmitBtn) return;
+  memberSubmitBtn.textContent = isEditing ? MEMBER_SUBMIT_EDITING : MEMBER_SUBMIT_DEFAULT;
+};
 
 const setAdminState = (loggedIn) => {
   localStorage.setItem(ADMIN_KEY, loggedIn ? 'true' : 'false');
@@ -264,6 +272,7 @@ if (memberForm) {
     if (Number.isInteger(editingMemberIndex) && members[editingMemberIndex]) {
       members[editingMemberIndex] = member;
       editingMemberIndex = null;
+      setMemberEditMode(false);
     } else {
       members.unshift(member);
     }
@@ -307,6 +316,7 @@ if (memberList) {
     memberForm.position.value = member.position;
     memberForm.joined.value = member.joined;
     editingMemberIndex = index;
+    setMemberEditMode(true);
     setLastActive();
   });
 }
@@ -406,6 +416,7 @@ if (clearBtn) {
       if (memberForm) {
         memberForm.reset();
       }
+      setMemberEditMode(false);
     }
   });
 }
