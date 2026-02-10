@@ -111,6 +111,15 @@ a {
   font-weight: 500;
 }
 
+.nav-button {
+  border: 1px solid rgba(26, 26, 26, 0.2);
+  background: #fff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .site-nav a {
   position: relative;
   padding: 6px 0;

@@ -20,11 +20,15 @@ const DEFAULT_ADMIN_PASS = '1234';
 const ADMIN_KEY = 'hugok_admin_logged_in';
 const ADMIN_PASS_KEY = 'hugok_admin_password';
 const MEMBERS_KEY = 'hugok_members';
+const ADMIN_LAST_ACTIVE_KEY = 'hugok_admin_last_active';
+const ADMIN_TIMEOUT_MS = 10 * 60 * 1000;
+const ADMIN_WARN_MS = 2 * 60 * 1000;
 
 const loginForm = document.querySelector('#admin-login-form');
 const memberForm = document.querySelector('#member-form');
 const memberList = document.querySelector('#member-list');
 const logoutBtn = document.querySelector('#admin-logout');
+const logoutTopBtn = document.querySelector('#admin-logout-top');
 const clearBtn = document.querySelector('#clear-members');
 const passwordForm = document.querySelector('#admin-password-form');
 
@@ -34,6 +38,15 @@ const setAdminState = (loggedIn) => {
 };
 
 const isAdmin = () => localStorage.getItem(ADMIN_KEY) === 'true';
+
+const setLastActive = () => {
+  localStorage.setItem(ADMIN_LAST_ACTIVE_KEY, String(Date.now()));
+};
+
+const getLastActive = () => {
+  const value = Number(localStorage.getItem(ADMIN_LAST_ACTIVE_KEY));
+  return Number.isFinite(value) ? value : 0;
+};
 
 const getAdminPassword = () => localStorage.getItem(ADMIN_PASS_KEY) || DEFAULT_ADMIN_PASS;
 
@@ -85,6 +98,9 @@ const updateAdminUI = () => {
   if (loginForm) {
     loginForm.style.display = loggedIn ? 'none' : 'block';
   }
+  if (logoutTopBtn) {
+    logoutTopBtn.style.display = loggedIn ? 'inline-flex' : 'none';
+  }
 };
 
 if (loginForm) {
@@ -95,6 +111,7 @@ if (loginForm) {
     const password = form.get('password');
     if (username === ADMIN_USER && password === getAdminPassword()) {
       setAdminState(true);
+      setLastActive();
       updateAdminUI();
       loginForm.reset();
       renderMembers();
@@ -132,6 +149,13 @@ if (memberForm) {
 
 if (logoutBtn) {
   logoutBtn.addEventListener('click', () => {
+    setAdminState(false);
+    updateAdminUI();
+  });
+}
+
+if (logoutTopBtn) {
+  logoutTopBtn.addEventListener('click', () => {
     setAdminState(false);
     updateAdminUI();
   });
@@ -187,3 +211,67 @@ if (passwordForm) {
 
 updateAdminUI();
 renderMembers();
+
+const getRemainingMs = () => {
+  const lastActive = getLastActive();
+  return lastActive ? ADMIN_TIMEOUT_MS - (Date.now() - lastActive) : 0;
+};
+
+const logoutDueToTimeout = () => {
+  setAdminState(false);
+  updateAdminUI();
+  alert('관리자 로그인 시간이 만료되어 로그아웃되었습니다.');
+};
+
+let warnTimeoutId;
+let logoutTimeoutId;
+
+const clearSessionTimers = () => {
+  if (warnTimeoutId) {
+    clearTimeout(warnTimeoutId);
+    warnTimeoutId = null;
+  }
+  if (logoutTimeoutId) {
+    clearTimeout(logoutTimeoutId);
+    logoutTimeoutId = null;
+  }
+};
+
+const scheduleSessionTimers = () => {
+  clearSessionTimers();
+  if (!isAdmin()) return;
+  const remaining = getRemainingMs();
+  if (remaining <= 0) {
+    logoutDueToTimeout();
+    return;
+  }
+
+  const warnIn = Math.max(0, remaining - ADMIN_WARN_MS);
+  warnTimeoutId = setTimeout(() => {
+    if (!isAdmin()) return;
+    const extend = confirm('로그인 만료가 2분 남았습니다. 연장하시겠습니까?');
+    if (extend) {
+      setLastActive();
+      scheduleSessionTimers();
+    }
+  }, warnIn);
+
+  logoutTimeoutId = setTimeout(() => {
+    if (!isAdmin()) return;
+    logoutDueToTimeout();
+  }, remaining);
+};
+
+const handleActivity = () => {
+  if (!isAdmin()) return;
+  setLastActive();
+  scheduleSessionTimers();
+};
+
+['click', 'keydown', 'scroll', 'touchstart'].forEach((evt) => {
+  document.addEventListener(evt, handleActivity, { passive: true });
+});
+
+if (isAdmin()) {
+  scheduleSessionTimers();
+}
