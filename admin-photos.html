@@ -36,15 +36,15 @@
         <div class="admin-grid admin-gallery">
           <form id="gallery-form" class="form-card" autocomplete="off">
             <label>
-              사진 URL
-              <input type="url" name="photoUrl" placeholder="https://example.com/photo.jpg" required />
+              사진 파일
+              <input type="file" name="photoFile" accept="image/*" required />
             </label>
             <label>
               캡션
               <input type="text" name="caption" placeholder="간단한 설명" required />
             </label>
             <button class="btn primary" type="submit">사진 추가</button>
-            <p class="form-hint">등록된 사진은 갤러리에 최대 16장까지 노출됩니다.</p>
+            <p class="form-hint">등록된 사진은 갤러리에 최대 16장까지 노출됩니다. (권장 2MB 이하)</p>
           </form>
           <div class="info-card">
             <h3>등록된 사진</h3>

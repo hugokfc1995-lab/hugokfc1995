@@ -188,7 +188,7 @@ const renderGalleryAdmin = () => {
       <img class="gallery-admin-thumb" src="${photo.url}" alt="${photo.caption}" loading="lazy" />
       <div class="gallery-admin-meta">
         <strong>${photo.caption}</strong>
-        <span>${photo.url}</span>
+        <span>${photo.url.startsWith('data:') ? '업로드 이미지' : photo.url}</span>
       </div>
       <div class="gallery-admin-actions">
         <button class="gallery-admin-remove" type="button" data-index="${index}">삭제</button>
@@ -349,19 +349,39 @@ if (photoForm) {
       return;
     }
     const form = new FormData(photoForm);
-    const url = String(form.get('photoUrl') || '').trim();
+    const file = form.get('photoFile');
     const caption = String(form.get('caption') || '').trim();
-    if (!url || !caption) {
-      alert('사진 URL과 캡션을 입력해 주세요.');
+    if (!(file instanceof File) || file.size === 0 || !caption) {
+      alert('사진 파일과 캡션을 입력해 주세요.');
       return;
     }
-    const photos = loadPhotos();
-    photos.unshift({ url, caption });
-    savePhotos(photos);
-    photoForm.reset();
-    renderGalleryAdmin();
-    renderGallery();
-    setLastActive();
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 등록할 수 있습니다.');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      const proceed = confirm('파일이 2MB를 초과합니다. 그래도 등록할까요?');
+      if (!proceed) return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const url = String(reader.result || '').trim();
+      if (!url) {
+        alert('이미지 로딩에 실패했습니다.');
+        return;
+      }
+      const photos = loadPhotos();
+      photos.unshift({ url, caption });
+      savePhotos(photos);
+      photoForm.reset();
+      renderGalleryAdmin();
+      renderGallery();
+      setLastActive();
+    };
+    reader.onerror = () => {
+      alert('이미지 로딩에 실패했습니다.');
+    };
+    reader.readAsDataURL(file);
   });
 }
 
