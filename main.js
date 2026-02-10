@@ -131,7 +131,7 @@ const logoutBtn = document.querySelector('#admin-logout');
 const logoutTopBtn = document.querySelector('#admin-logout-top');
 const remainingEl = document.querySelector('#admin-logout-top');
 const galleryGrid = document.querySelector('#gallery-grid');
-const galleryMoreBtn = document.querySelector('#gallery-more');
+const galleryPagination = document.querySelector('#gallery-pagination');
 const photoForm = document.querySelector('#gallery-form');
 const photoList = document.querySelector('#gallery-list');
 const clearGalleryBtn = document.querySelector('#clear-gallery');
@@ -244,6 +244,10 @@ const savePhotos = (photos) => {
   localStorage.setItem(PHOTOS_KEY, JSON.stringify(photos));
 };
 
+const clearStoredPhotos = () => {
+  localStorage.removeItem(PHOTOS_KEY);
+};
+
 const renderMembers = () => {
   if (!memberList) return;
   const members = loadMembers();
@@ -288,27 +292,38 @@ const getGalleryItems = () => {
   return merged.slice(0, MAX_GALLERY_ITEMS);
 };
 
-let galleryVisibleCount = GALLERY_PAGE_SIZE;
+let galleryCurrentPage = 1;
 
-const updateGalleryMore = (total) => {
-  if (!galleryMoreBtn) return;
-  if (total <= GALLERY_PAGE_SIZE || galleryVisibleCount >= total) {
-    galleryMoreBtn.style.display = 'none';
+const renderGalleryPagination = (total) => {
+  if (!galleryPagination) return;
+  const totalPages = Math.max(1, Math.ceil(total / GALLERY_PAGE_SIZE));
+  if (galleryCurrentPage > totalPages) {
+    galleryCurrentPage = totalPages;
+  }
+  if (totalPages <= 1) {
+    galleryPagination.innerHTML = '';
     return;
   }
-  galleryMoreBtn.style.display = 'inline-flex';
-  galleryMoreBtn.textContent = `더보기 (${galleryVisibleCount}/${total})`;
+  const buttons = [];
+  const prevDisabled = galleryCurrentPage === 1 ? 'disabled' : '';
+  const nextDisabled = galleryCurrentPage === totalPages ? 'disabled' : '';
+  buttons.push(`<button type="button" data-page="prev" ${prevDisabled}>이전</button>`);
+  for (let page = 1; page <= totalPages; page += 1) {
+    const active = page === galleryCurrentPage ? 'aria-current="page"' : '';
+    buttons.push(`<button type="button" data-page="${page}" ${active}>${page}</button>`);
+  }
+  buttons.push(`<button type="button" data-page="next" ${nextDisabled}>다음</button>`);
+  galleryPagination.innerHTML = buttons.join('');
 };
 
 const renderGallery = () => {
   if (!galleryGrid) return;
   const items = getGalleryItems();
-  if (galleryVisibleCount > items.length) {
-    galleryVisibleCount = Math.min(items.length, GALLERY_PAGE_SIZE);
-  }
   galleryGrid.innerHTML = '';
+  const startIndex = (galleryCurrentPage - 1) * GALLERY_PAGE_SIZE;
+  const endIndex = startIndex + GALLERY_PAGE_SIZE;
   items.forEach((photo, index) => {
-    if (index >= galleryVisibleCount) return;
+    if (index < startIndex || index >= endIndex) return;
     const item = document.createElement('div');
     item.className = 'gallery-item';
     item.dataset.index = String(index);
@@ -318,7 +333,7 @@ const renderGallery = () => {
     `;
     galleryGrid.appendChild(item);
   });
-  updateGalleryMore(items.length);
+  renderGalleryPagination(items.length);
 };
 
 const renderGalleryAdmin = () => {
@@ -646,6 +661,7 @@ if (passwordForm) {
   });
 }
 
+clearStoredPhotos();
 updateAdminUI();
 renderMembers();
 renderGallery();
@@ -736,10 +752,24 @@ if (galleryGrid) {
   });
 }
 
-if (galleryMoreBtn) {
-  galleryMoreBtn.addEventListener('click', () => {
+if (galleryPagination) {
+  galleryPagination.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLButtonElement)) return;
+    const value = target.dataset.page;
+    if (!value) return;
     const items = getGalleryItems();
-    galleryVisibleCount = Math.min(items.length, galleryVisibleCount + GALLERY_PAGE_SIZE);
+    const totalPages = Math.max(1, Math.ceil(items.length / GALLERY_PAGE_SIZE));
+    if (value === 'prev') {
+      galleryCurrentPage = Math.max(1, galleryCurrentPage - 1);
+    } else if (value === 'next') {
+      galleryCurrentPage = Math.min(totalPages, galleryCurrentPage + 1);
+    } else {
+      const page = Number(value);
+      if (Number.isInteger(page)) {
+        galleryCurrentPage = Math.min(totalPages, Math.max(1, page));
+      }
+    }
     renderGallery();
   });
 }
