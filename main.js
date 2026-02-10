@@ -238,6 +238,7 @@ const logoutTopBtn = document.querySelector('#admin-logout-top');
 const remainingEl = document.querySelector('#admin-logout-top');
 const galleryGrid = document.querySelector('#gallery-grid');
 const galleryPagination = document.querySelector('#gallery-pagination');
+const galleryMoreBtn = document.querySelector('#gallery-more');
 const scheduleDateEl = document.querySelector('#schedule-date');
 const scheduleTimeEl = document.querySelector('#schedule-time');
 const schedulePlaceEl = document.querySelector('#schedule-place');
@@ -402,11 +403,19 @@ const getGalleryItems = () => {
   return merged.slice(0, MAX_GALLERY_ITEMS);
 };
 
+const galleryPageSize =
+  Number(document.body?.dataset?.galleryPageSize) || GALLERY_PAGE_SIZE;
+const galleryMode = document.body?.dataset?.galleryMode || (galleryPagination ? 'pagination' : 'more');
+
 let galleryCurrentPage = 1;
+let galleryVisibleCount = galleryPageSize;
 
 const renderGalleryPagination = (total) => {
-  if (!galleryPagination) return;
-  const totalPages = Math.max(1, Math.ceil(total / GALLERY_PAGE_SIZE));
+  if (!galleryPagination || galleryMode !== 'pagination') {
+    if (galleryPagination) galleryPagination.innerHTML = '';
+    return;
+  }
+  const totalPages = Math.max(1, Math.ceil(total / galleryPageSize));
   if (galleryCurrentPage > totalPages) {
     galleryCurrentPage = totalPages;
   }
@@ -428,12 +437,34 @@ const renderGalleryPagination = (total) => {
   galleryPagination.innerHTML = buttons.join('');
 };
 
+const updateGalleryMore = (total) => {
+  if (!galleryMoreBtn || galleryMode !== 'more') {
+    if (galleryMoreBtn) galleryMoreBtn.style.display = 'none';
+    return;
+  }
+  if (total <= galleryPageSize || galleryVisibleCount >= total) {
+    galleryMoreBtn.style.display = 'none';
+    return;
+  }
+  galleryMoreBtn.style.display = 'inline-flex';
+  galleryMoreBtn.textContent = `더보기 (${galleryVisibleCount}/${total})`;
+};
+
 const renderGallery = () => {
   if (!galleryGrid) return;
   const items = getGalleryItems();
   galleryGrid.innerHTML = '';
-  const startIndex = (galleryCurrentPage - 1) * GALLERY_PAGE_SIZE;
-  const endIndex = startIndex + GALLERY_PAGE_SIZE;
+  let startIndex = 0;
+  let endIndex = items.length;
+  if (galleryMode === 'pagination') {
+    startIndex = (galleryCurrentPage - 1) * galleryPageSize;
+    endIndex = startIndex + galleryPageSize;
+  } else if (galleryMode === 'more') {
+    if (galleryVisibleCount > items.length) {
+      galleryVisibleCount = Math.min(items.length, galleryPageSize);
+    }
+    endIndex = galleryVisibleCount;
+  }
   items.forEach((photo, index) => {
     if (index < startIndex || index >= endIndex) return;
     const item = document.createElement('div');
@@ -446,6 +477,7 @@ const renderGallery = () => {
     galleryGrid.appendChild(item);
   });
   renderGalleryPagination(items.length);
+  updateGalleryMore(items.length);
 };
 
 const renderGalleryAdmin = () => {
@@ -874,7 +906,7 @@ if (galleryPagination) {
     const value = button.dataset.page;
     if (!value) return;
     const items = getGalleryItems();
-    const totalPages = Math.max(1, Math.ceil(items.length / GALLERY_PAGE_SIZE));
+    const totalPages = Math.max(1, Math.ceil(items.length / galleryPageSize));
     if (value === 'prev') {
       galleryCurrentPage = Math.max(1, galleryCurrentPage - 1);
     } else if (value === 'next') {
@@ -885,6 +917,15 @@ if (galleryPagination) {
         galleryCurrentPage = Math.min(totalPages, Math.max(1, page));
       }
     }
+    renderGallery();
+  });
+}
+
+if (galleryMoreBtn) {
+  galleryMoreBtn.addEventListener('click', () => {
+    if (galleryMode !== 'more') return;
+    const items = getGalleryItems();
+    galleryVisibleCount = Math.min(items.length, galleryVisibleCount + galleryPageSize);
     renderGallery();
   });
 }

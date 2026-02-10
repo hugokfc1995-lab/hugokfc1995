@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>후곡생활축구회 | 소개</title>
-  <meta name="description" content="후곡생활축구회 소개 페이지" />
+  <title>후곡생활축구회 | 갤러리</title>
+  <meta name="description" content="후곡생활축구회 활동 갤러리" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body data-gallery-mode="more" data-gallery-page-size="16">
   <div class="bg-orb orb-1" aria-hidden="true"></div>
   <div class="bg-orb orb-2" aria-hidden="true"></div>
   <header class="site-header">
@@ -32,38 +32,15 @@
   </header>
 
   <main>
-    <section class="section">
+    <section id="gallery" class="section alt">
       <div class="container">
         <div class="section-head">
-          <p class="eyebrow">ABOUT</p>
-          <h2>후곡생활축구회 소개</h2>
+          <p class="eyebrow">GALLERY</p>
+          <h2>활동 갤러리</h2>
         </div>
-        <div class="about-grid">
-          <div>
-            <p>
-              후곡생활축구회는 봉일천 조리체육공원에서 활동하고 있는
-              순수 생활축구 동호회입니다. 경기력보다 팀워크와 즐거운 운동 문화를
-              우선으로 생각합니다.
-            </p>
-            <p>
-              신규 회원은 연령, 실력에 관계없이 환영하며, 매주 정기 모임과 함께
-              친선 교류전, 정기 행사도 진행합니다.
-            </p>
-          </div>
-          <div class="info-list">
-            <div class="info-item">
-              <h3>주요 활동</h3>
-              <p>일요일 정기 경기, 년 2회 로컬대회</p>
-            </div>
-            <div class="info-item">
-              <h3>운영 철학</h3>
-              <p>매너, 배려, 안전을 기본으로 즐기는 축구</p>
-            </div>
-            <div class="info-item">
-              <h3>시설</h3>
-              <p>조리체육공원, 라커룸 및 주차장</p>
-            </div>
-          </div>
+        <div id="gallery-grid" class="gallery-grid" aria-live="polite"></div>
+        <div class="gallery-actions">
+          <button id="gallery-more" class="btn ghost" type="button">더보기</button>
         </div>
       </div>
     </section>
