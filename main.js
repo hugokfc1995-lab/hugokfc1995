@@ -78,12 +78,24 @@ const setAdminState = (loggedIn) => {
 
 const isAdmin = () => localStorage.getItem(ADMIN_KEY) === 'true';
 
+const guardAdminNavLinks = () => {
+  const adminLinks = document.querySelectorAll('.site-nav a[href^="admin-"]');
+  if (!adminLinks.length) return;
+  adminLinks.forEach((link) => {
+    link.addEventListener('click', (event) => {
+      if (isAdmin()) return;
+      event.preventDefault();
+      window.location.href = 'admin.html';
+    });
+  });
+};
+
 const enforceAdminAccess = () => {
   if (!document.body.classList.contains('admin-page')) return;
-  const path = window.location.pathname;
+  const path = window.location.pathname.replace(/\/+$/, '');
   if (isAdmin()) return;
-  if (path.endsWith('/admin.html') || path.endsWith('admin.html')) return;
-  window.location.href = '/admin.html';
+  if (path.endsWith('/admin.html') || path.endsWith('/admin')) return;
+  window.location.href = 'admin.html';
 };
 
 const setLastActive = () => {
@@ -434,7 +446,7 @@ if (logoutBtn) {
     setAdminState(false);
     updateAdminUI();
     if (document.body.classList.contains('admin-page')) {
-      window.location.href = '/index.html';
+      window.location.href = 'index.html';
     }
   });
 }
@@ -444,7 +456,7 @@ if (logoutTopBtn) {
     setAdminState(false);
     updateAdminUI();
     if (document.body.classList.contains('admin-page')) {
-      window.location.href = '/index.html';
+      window.location.href = 'index.html';
     }
   });
 }
@@ -509,6 +521,7 @@ updateAdminUI();
 renderMembers();
 renderGallery();
 renderGalleryAdmin();
+guardAdminNavLinks();
 enforceAdminAccess();
 
 let galleryModal;
