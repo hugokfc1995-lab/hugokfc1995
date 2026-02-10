@@ -52,6 +52,25 @@ const setMemberEditMode = (isEditing) => {
   memberSubmitBtn.textContent = isEditing ? MEMBER_SUBMIT_EDITING : MEMBER_SUBMIT_DEFAULT;
 };
 
+const getSelectedPositions = () => {
+  if (!memberForm) return [];
+  return Array.from(memberForm.querySelectorAll('input[name="position"]:checked')).map(
+    (input) => input.value,
+  );
+};
+
+const setSelectedPositions = (positions) => {
+  if (!memberForm) return;
+  const normalized = new Set(
+    (Array.isArray(positions) ? positions : String(positions || '').split(','))
+      .map((value) => String(value).trim())
+      .filter(Boolean),
+  );
+  memberForm.querySelectorAll('input[name="position"]').forEach((input) => {
+    input.checked = normalized.has(input.value);
+  });
+};
+
 const setAdminState = (loggedIn) => {
   localStorage.setItem(ADMIN_KEY, loggedIn ? 'true' : 'false');
   document.body.classList.toggle('admin-logged-in', loggedIn);
@@ -258,13 +277,14 @@ if (memberForm) {
       return;
     }
     const form = new FormData(memberForm);
+    const positions = getSelectedPositions();
     const member = {
       name: String(form.get('name') || '').trim(),
       phone: String(form.get('phone') || '').trim(),
-      position: String(form.get('position') || '').trim(),
+      position: positions.join(', '),
       joined: String(form.get('joined') || '').trim(),
     };
-    if (!member.name || !member.phone || !member.position || !member.joined) {
+    if (!member.name || !member.phone || positions.length === 0 || !member.joined) {
       alert('모든 항목을 입력해 주세요.');
       return;
     }
@@ -313,8 +333,8 @@ if (memberList) {
     if (!memberForm) return;
     memberForm.name.value = member.name;
     memberForm.phone.value = member.phone;
-    memberForm.position.value = member.position;
     memberForm.joined.value = member.joined;
+    setSelectedPositions(member.position);
     editingMemberIndex = index;
     setMemberEditMode(true);
     setLastActive();

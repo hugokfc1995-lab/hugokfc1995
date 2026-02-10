@@ -399,6 +399,24 @@ a {
   margin-bottom: 14px;
 }
 
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  font-weight: 500;
+}
+
+.checkbox-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.checkbox-item input {
+  width: 16px;
+  height: 16px;
+}
+
 .form-card input {
   border: 1px solid rgba(26, 26, 26, 0.2);
   border-radius: 10px;

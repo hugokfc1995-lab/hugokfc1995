@@ -45,13 +45,24 @@
             </label>
             <label>
               포지션
-              <select name="position" required>
-                <option value="" disabled selected>포지션 선택</option>
-                <option value="FW">FW</option>
-                <option value="MF">MF</option>
-                <option value="DF">DF</option>
-                <option value="GK">GK</option>
-              </select>
+              <div class="checkbox-group">
+                <label class="checkbox-item">
+                  <input type="checkbox" name="position" value="FW" />
+                  FW
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="position" value="MF" />
+                  MF
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="position" value="DF" />
+                  DF
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="position" value="GK" />
+                  GK
+                </label>
+              </div>
             </label>
             <label>
               가입일
