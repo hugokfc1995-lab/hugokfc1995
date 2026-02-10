@@ -82,6 +82,9 @@ const updateAdminUI = () => {
   if (adminSection) {
     adminSection.style.display = loggedIn ? 'block' : 'none';
   }
+  if (loginForm) {
+    loginForm.style.display = loggedIn ? 'none' : 'block';
+  }
 };
 
 if (loginForm) {
