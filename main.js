@@ -275,18 +275,17 @@ const renderMembers = () => {
 
 const getGalleryItems = () => {
   const saved = loadPhotos();
-  if (saved.length > 0) {
-    const seen = new Set();
-    const deduped = [];
-    saved.forEach((photo) => {
-      if (!photo || !photo.url) return;
-      if (seen.has(photo.url)) return;
-      seen.add(photo.url);
-      deduped.push(photo);
-    });
-    return deduped.slice(0, MAX_GALLERY_ITEMS);
-  }
-  return DEFAULT_PHOTOS.slice(0, MAX_GALLERY_ITEMS);
+  const merged = [];
+  const seen = new Set();
+  const addPhoto = (photo) => {
+    if (!photo || !photo.url) return;
+    if (seen.has(photo.url)) return;
+    seen.add(photo.url);
+    merged.push(photo);
+  };
+  saved.forEach(addPhoto);
+  DEFAULT_PHOTOS.forEach(addPhoto);
+  return merged.slice(0, MAX_GALLERY_ITEMS);
 };
 
 let galleryVisibleCount = GALLERY_PAGE_SIZE;
