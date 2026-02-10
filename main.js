@@ -78,6 +78,11 @@ const setAdminState = (loggedIn) => {
 
 const isAdmin = () => localStorage.getItem(ADMIN_KEY) === 'true';
 
+const isAdminLoginPage = () => {
+  const path = window.location.pathname.replace(/\/+$/, '');
+  return path.endsWith('/admin.html') || path.endsWith('/admin');
+};
+
 const guardAdminNavLinks = () => {
   const adminLinks = document.querySelectorAll('.site-nav a[href^="admin-"]');
   if (!adminLinks.length) return;
@@ -85,6 +90,15 @@ const guardAdminNavLinks = () => {
     link.addEventListener('click', (event) => {
       if (isAdmin()) return;
       event.preventDefault();
+      if (isAdminLoginPage()) {
+        if (loginForm) {
+          const firstInput = loginForm.querySelector('input');
+          if (firstInput instanceof HTMLElement) {
+            firstInput.focus();
+          }
+        }
+        return;
+      }
       window.location.href = 'admin.html';
     });
   });
@@ -92,9 +106,8 @@ const guardAdminNavLinks = () => {
 
 const enforceAdminAccess = () => {
   if (!document.body.classList.contains('admin-page')) return;
-  const path = window.location.pathname.replace(/\/+$/, '');
   if (isAdmin()) return;
-  if (path.endsWith('/admin.html') || path.endsWith('/admin')) return;
+  if (isAdminLoginPage()) return;
   window.location.href = 'admin.html';
 };
 
