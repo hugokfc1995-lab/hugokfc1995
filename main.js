@@ -119,6 +119,7 @@ const DEFAULT_PHOTOS = DEFAULT_GALLERY_FILES.map((file) => {
   const detail = DEFAULT_GALLERY_CAPTIONS[file];
   return {
     url: `images/gallery/${file}`,
+    thumb: `images/gallery/thumbs/${file}`,
     caption: detail ? `${dateCaption} - ${detail}` : dateCaption,
   };
 });
@@ -330,7 +331,7 @@ const renderGallery = () => {
     item.className = 'gallery-item';
     item.dataset.index = String(index);
     item.innerHTML = `
-      <img src="${photo.url}" alt="${photo.caption}" loading="lazy" />
+      <img src="${photo.thumb || photo.url}" alt="${photo.caption}" loading="lazy" />
       <span class="gallery-caption" data-index="${index}">${photo.caption}</span>
     `;
     galleryGrid.appendChild(item);
