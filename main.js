@@ -29,6 +29,7 @@ const memberForm = document.querySelector('#member-form');
 const memberList = document.querySelector('#member-list');
 const logoutBtn = document.querySelector('#admin-logout');
 const logoutTopBtn = document.querySelector('#admin-logout-top');
+const remainingEl = document.querySelector('#admin-remaining');
 const clearBtn = document.querySelector('#clear-members');
 const passwordForm = document.querySelector('#admin-password-form');
 
@@ -88,6 +89,43 @@ const renderMembers = () => {
   });
 };
 
+const getRemainingMs = () => {
+  const lastActive = getLastActive();
+  return lastActive ? ADMIN_TIMEOUT_MS - (Date.now() - lastActive) : 0;
+};
+
+let remainingIntervalId;
+
+const formatRemaining = (ms) => {
+  const safeMs = Math.max(0, ms);
+  const totalSeconds = Math.floor(safeMs / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+};
+
+const updateRemainingUI = () => {
+  if (!remainingEl) return;
+  if (!isAdmin()) {
+    remainingEl.textContent = '';
+    remainingEl.style.display = 'none';
+    return;
+  }
+  remainingEl.textContent = `남은시간 ${formatRemaining(getRemainingMs())}`;
+  remainingEl.style.display = 'inline-flex';
+};
+
+const startRemainingTicker = () => {
+  if (!remainingEl) return;
+  if (remainingIntervalId) {
+    clearInterval(remainingIntervalId);
+    remainingIntervalId = null;
+  }
+  updateRemainingUI();
+  if (!isAdmin()) return;
+  remainingIntervalId = setInterval(updateRemainingUI, 1000);
+};
+
 const updateAdminUI = () => {
   const loggedIn = isAdmin();
   setAdminState(loggedIn);
@@ -101,6 +139,7 @@ const updateAdminUI = () => {
   if (logoutTopBtn) {
     logoutTopBtn.style.display = loggedIn ? 'inline-flex' : 'none';
   }
+  startRemainingTicker();
 };
 
 if (loginForm) {
@@ -211,11 +250,6 @@ if (passwordForm) {
 
 updateAdminUI();
 renderMembers();
-
-const getRemainingMs = () => {
-  const lastActive = getLastActive();
-  return lastActive ? ADMIN_TIMEOUT_MS - (Date.now() - lastActive) : 0;
-};
 
 const logoutDueToTimeout = () => {
   setAdminState(false);
