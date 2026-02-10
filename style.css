@@ -365,6 +365,12 @@ a {
   gap: 16px;
 }
 
+.gallery-actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+}
+
 .gallery-item {
   position: relative;
   overflow: hidden;

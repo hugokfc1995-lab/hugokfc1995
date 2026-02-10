@@ -25,6 +25,7 @@ const ADMIN_LAST_ACTIVE_KEY = 'hugok_admin_last_active';
 const ADMIN_TIMEOUT_MS = 10 * 60 * 1000;
 const ADMIN_WARN_MS = 2 * 60 * 1000;
 const MAX_GALLERY_ITEMS = 60;
+const GALLERY_PAGE_SIZE = 16;
 const formatDateCaption = (filename) => {
   const base = filename.replace(/\.[^/.]+$/, '');
   if (/^\d{8}_/.test(base)) {
@@ -79,10 +80,48 @@ const DEFAULT_GALLERY_FILES = [
   '20260125_100306.jpg',
 ];
 
-const DEFAULT_PHOTOS = DEFAULT_GALLERY_FILES.map((file) => ({
-  url: `images/gallery/${file}`,
-  caption: formatDateCaption(file),
-}));
+const DEFAULT_GALLERY_CAPTIONS = {
+  '1770724491236.jpg': '시무식 시상식 기념사진',
+  '1770724504135.jpg': '야간 운동 전 스트레칭',
+  '1770724504230.jpg': '야간 운동 준비 스트레칭',
+  '1770724512516.jpg': '훈련 후 간식 나눔',
+  '1770724523734.jpg': '주말 경기 진행',
+  '1770724523814.jpg': '훈련 전 스트레칭',
+  '1770724553533.jpg': '모임 선물 증정',
+  '1770724553596.jpg': '야외 모임 단체샷',
+  '1770724553656.jpg': '야외 모임 단체샷 2',
+  '1770724554176.jpg': '단체 셀카',
+  '1770724554235.jpg': '단체 셀카 2',
+  '1770724554401.jpg': '단체 셀카 3',
+  '1770724554449.jpg': '단체 셀카 4',
+  '1770724554522.jpg': '단체 셀카 5',
+  '1770724554573.jpg': '단체 셀카 6',
+  '1770724554624.jpg': '단체 셀카 7',
+  '1770724554699.jpg': '단체 셀카 8',
+  '1770724554757.jpg': '단체 셀카 9',
+  '1770724554817.jpg': '단체 셀카 10',
+  '1770724554878.jpg': '단체 셀카 11',
+  '1770724554949.jpg': '단체 셀카 12',
+  '1770724555067.jpg': '단체 셀카 13',
+  '1770724555276.jpg': '단체 셀카 14',
+  '20250202_084850.jpg': '동계 단체사진',
+  '20250608_162605.jpg': '친목 식사',
+  '20250608_163300.jpg': '친목 식사 인증샷',
+  '20251102_191315.jpg': '가을 뒤풀이',
+  '20260125_100051.jpg': '훈련 후 라면 준비',
+  '20260125_100102.jpg': '훈련 후 라면 나눔',
+  '20260125_100108.jpg': '훈련 후 라면 끓이는 중',
+  '20260125_100306.jpg': '훈련 후 간식 시간',
+};
+
+const DEFAULT_PHOTOS = DEFAULT_GALLERY_FILES.map((file) => {
+  const dateCaption = formatDateCaption(file);
+  const detail = DEFAULT_GALLERY_CAPTIONS[file];
+  return {
+    url: `images/gallery/${file}`,
+    caption: detail ? `${dateCaption} - ${detail}` : dateCaption,
+  };
+});
 
 const loginForm = document.querySelector('#admin-login-form');
 const memberForm = document.querySelector('#member-form');
@@ -92,6 +131,7 @@ const logoutBtn = document.querySelector('#admin-logout');
 const logoutTopBtn = document.querySelector('#admin-logout-top');
 const remainingEl = document.querySelector('#admin-logout-top');
 const galleryGrid = document.querySelector('#gallery-grid');
+const galleryMoreBtn = document.querySelector('#gallery-more');
 const photoForm = document.querySelector('#gallery-form');
 const photoList = document.querySelector('#gallery-list');
 const clearGalleryBtn = document.querySelector('#clear-gallery');
@@ -235,19 +275,41 @@ const renderMembers = () => {
 
 const getGalleryItems = () => {
   const saved = loadPhotos();
-  if (saved.length === 0) return DEFAULT_PHOTOS.slice(0, MAX_GALLERY_ITEMS);
-  const merged = saved.slice(0, MAX_GALLERY_ITEMS);
-  if (merged.length < MAX_GALLERY_ITEMS) {
-    merged.push(...DEFAULT_PHOTOS.slice(0, MAX_GALLERY_ITEMS - merged.length));
+  if (saved.length > 0) {
+    const seen = new Set();
+    const deduped = [];
+    saved.forEach((photo) => {
+      if (!photo || !photo.url) return;
+      if (seen.has(photo.url)) return;
+      seen.add(photo.url);
+      deduped.push(photo);
+    });
+    return deduped.slice(0, MAX_GALLERY_ITEMS);
   }
-  return merged;
+  return DEFAULT_PHOTOS.slice(0, MAX_GALLERY_ITEMS);
+};
+
+let galleryVisibleCount = GALLERY_PAGE_SIZE;
+
+const updateGalleryMore = (total) => {
+  if (!galleryMoreBtn) return;
+  if (total <= GALLERY_PAGE_SIZE || galleryVisibleCount >= total) {
+    galleryMoreBtn.style.display = 'none';
+    return;
+  }
+  galleryMoreBtn.style.display = 'inline-flex';
+  galleryMoreBtn.textContent = `더보기 (${galleryVisibleCount}/${total})`;
 };
 
 const renderGallery = () => {
   if (!galleryGrid) return;
   const items = getGalleryItems();
+  if (galleryVisibleCount > items.length) {
+    galleryVisibleCount = Math.min(items.length, GALLERY_PAGE_SIZE);
+  }
   galleryGrid.innerHTML = '';
   items.forEach((photo, index) => {
+    if (index >= galleryVisibleCount) return;
     const item = document.createElement('div');
     item.className = 'gallery-item';
     item.dataset.index = String(index);
@@ -257,6 +319,7 @@ const renderGallery = () => {
     `;
     galleryGrid.appendChild(item);
   });
+  updateGalleryMore(items.length);
 };
 
 const renderGalleryAdmin = () => {
@@ -671,6 +734,14 @@ if (galleryGrid) {
     if (!Number.isInteger(index)) return;
     const items = getGalleryItems();
     openGalleryModal(items[index]);
+  });
+}
+
+if (galleryMoreBtn) {
+  galleryMoreBtn.addEventListener('click', () => {
+    const items = getGalleryItems();
+    galleryVisibleCount = Math.min(items.length, galleryVisibleCount + GALLERY_PAGE_SIZE);
+    renderGallery();
   });
 }
 
