@@ -392,14 +392,6 @@ renderMembers();
 renderGallery();
 renderGalleryAdmin();
 
-const refreshAdminSessionOnPage = () => {
-  if (!isAdmin()) return;
-  if (!document.body.classList.contains('admin-page')) return;
-  setLastActive();
-  scheduleSessionTimers();
-  updateRemainingUI();
-};
-
 const logoutDueToTimeout = () => {
   setAdminState(false);
   updateAdminUI();
@@ -459,5 +451,3 @@ const handleActivity = () => {
 if (isAdmin()) {
   scheduleSessionTimers();
 }
-
-refreshAdminSessionOnPage();
