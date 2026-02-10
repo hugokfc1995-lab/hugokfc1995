@@ -437,22 +437,23 @@ const scheduleSessionTimers = () => {
   }, remaining);
 };
 
-const handleActivity = (event) => {
+const adminMain = document.querySelector('main');
+const handleAdminActivity = (event) => {
   if (!isAdmin()) return;
   if (!document.body.classList.contains('admin-page')) return;
-  if (event && event.type === 'click') {
-    const target = event.target;
-    if (target instanceof Element && target.closest('a[href]')) {
-      return;
-    }
-  }
+  if (!adminMain) return;
+  const target = event?.target;
+  if (!(target instanceof Element)) return;
+  if (!adminMain.contains(target)) return;
   setLastActive();
   scheduleSessionTimers();
 };
 
-['click', 'keydown', 'scroll', 'touchstart'].forEach((evt) => {
-  document.addEventListener(evt, handleActivity, { passive: true });
-});
+if (adminMain) {
+  ['click', 'keydown', 'input', 'submit'].forEach((evt) => {
+    adminMain.addEventListener(evt, handleAdminActivity);
+  });
+}
 
 if (isAdmin()) {
   scheduleSessionTimers();
