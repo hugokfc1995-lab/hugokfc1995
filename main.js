@@ -99,13 +99,20 @@ const renderMembers = () => {
     memberList.appendChild(empty);
     return;
   }
-  members.forEach((member) => {
+  members.forEach((member, index) => {
     const item = document.createElement('li');
+    item.className = 'member-item';
     item.innerHTML = `
-      <strong>${member.name}</strong>
-      <span>연락처: ${member.phone}</span>
-      <span>포지션: ${member.position}</span>
-      <span>가입일: ${member.joined}</span>
+      <div class="member-meta">
+        <strong>${member.name}</strong>
+        <span>연락처: ${member.phone}</span>
+        <span>포지션: ${member.position}</span>
+        <span>가입일: ${member.joined}</span>
+      </div>
+      <div class="member-actions">
+        <button class="member-edit" type="button" data-index="${index}">수정</button>
+        <button class="member-delete" type="button" data-index="${index}">삭제</button>
+      </div>
     `;
     memberList.appendChild(item);
   });
@@ -257,6 +264,59 @@ if (memberForm) {
     saveMembers(members);
     memberForm.reset();
     renderMembers();
+  });
+}
+
+if (memberList) {
+  memberList.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    if (!target.classList.contains('member-edit') && !target.classList.contains('member-delete')) {
+      return;
+    }
+    if (!isAdmin()) {
+      alert('관리자 로그인 후 사용 가능합니다.');
+      return;
+    }
+    const index = Number(target.dataset.index);
+    if (!Number.isInteger(index)) return;
+    const members = loadMembers();
+    const member = members[index];
+    if (!member) return;
+
+    if (target.classList.contains('member-delete')) {
+      if (confirm('선택한 회원을 삭제할까요?')) {
+        members.splice(index, 1);
+        saveMembers(members);
+        renderMembers();
+        setLastActive();
+      }
+      return;
+    }
+
+    const name = prompt('이름', member.name);
+    if (name === null) return;
+    const phone = prompt('연락처', member.phone);
+    if (phone === null) return;
+    const position = prompt('포지션', member.position);
+    if (position === null) return;
+    const joined = prompt('가입일 (YYYY-MM-DD)', member.joined);
+    if (joined === null) return;
+
+    const updated = {
+      name: String(name).trim(),
+      phone: String(phone).trim(),
+      position: String(position).trim(),
+      joined: String(joined).trim(),
+    };
+    if (!updated.name || !updated.phone || !updated.position || !updated.joined) {
+      alert('모든 항목을 입력해 주세요.');
+      return;
+    }
+    members[index] = updated;
+    saveMembers(members);
+    renderMembers();
+    setLastActive();
   });
 }
 

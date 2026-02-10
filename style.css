@@ -429,6 +429,39 @@ a {
   font-size: 14px;
 }
 
+.member-item {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.member-meta {
+  display: grid;
+  gap: 4px;
+}
+
+.member-actions {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.member-edit,
+.member-delete {
+  border: 1px solid rgba(26, 26, 26, 0.2);
+  background: #fff;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.member-delete {
+  border-color: rgba(190, 30, 30, 0.3);
+  color: #b22;
+}
+
 .gallery-admin-list {
   list-style: none;
   display: grid;
