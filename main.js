@@ -42,6 +42,7 @@ const photoList = document.querySelector('#gallery-list');
 const clearGalleryBtn = document.querySelector('#clear-gallery');
 const clearBtn = document.querySelector('#clear-members');
 const passwordForm = document.querySelector('#admin-password-form');
+let editingMemberIndex = null;
 
 const setAdminState = (loggedIn) => {
   localStorage.setItem(ADMIN_KEY, loggedIn ? 'true' : 'false');
@@ -260,10 +261,16 @@ if (memberForm) {
       return;
     }
     const members = loadMembers();
-    members.unshift(member);
+    if (Number.isInteger(editingMemberIndex) && members[editingMemberIndex]) {
+      members[editingMemberIndex] = member;
+      editingMemberIndex = null;
+    } else {
+      members.unshift(member);
+    }
     saveMembers(members);
     memberForm.reset();
     renderMembers();
+    setLastActive();
   });
 }
 
@@ -294,28 +301,12 @@ if (memberList) {
       return;
     }
 
-    const name = prompt('이름', member.name);
-    if (name === null) return;
-    const phone = prompt('연락처', member.phone);
-    if (phone === null) return;
-    const position = prompt('포지션', member.position);
-    if (position === null) return;
-    const joined = prompt('가입일 (YYYY-MM-DD)', member.joined);
-    if (joined === null) return;
-
-    const updated = {
-      name: String(name).trim(),
-      phone: String(phone).trim(),
-      position: String(position).trim(),
-      joined: String(joined).trim(),
-    };
-    if (!updated.name || !updated.phone || !updated.position || !updated.joined) {
-      alert('모든 항목을 입력해 주세요.');
-      return;
-    }
-    members[index] = updated;
-    saveMembers(members);
-    renderMembers();
+    if (!memberForm) return;
+    memberForm.name.value = member.name;
+    memberForm.phone.value = member.phone;
+    memberForm.position.value = member.position;
+    memberForm.joined.value = member.joined;
+    editingMemberIndex = index;
     setLastActive();
   });
 }
@@ -405,9 +396,16 @@ if (clearBtn) {
       alert('관리자 로그인 후 사용 가능합니다.');
       return;
     }
-    if (confirm('회원 목록을 모두 초기화할까요?')) {
+    if (!confirm('회원 목록을 모두 초기화할까요?')) {
+      return;
+    }
+    if (confirm('정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
       saveMembers([]);
       renderMembers();
+      editingMemberIndex = null;
+      if (memberForm) {
+        memberForm.reset();
+      }
     }
   });
 }
