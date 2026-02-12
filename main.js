@@ -953,6 +953,7 @@ const logoutDueToTimeout = () => {
 
 let warnTimeoutId;
 let logoutTimeoutId;
+let warnDismissedForLastActive = null;
 
 const clearSessionTimers = () => {
   if (warnTimeoutId) {
@@ -975,14 +976,20 @@ const scheduleSessionTimers = () => {
   }
 
   const warnIn = Math.max(0, remaining - ADMIN_WARN_MS);
-  warnTimeoutId = setTimeout(() => {
-    if (!isAdmin()) return;
-    const extend = confirm('로그인 만료가 2분 남았습니다. 연장하시겠습니까?');
-    if (extend) {
-      setLastActive();
-      scheduleSessionTimers();
-    }
-  }, warnIn);
+  const lastActive = getLastActive();
+  if (warnDismissedForLastActive !== lastActive) {
+    warnTimeoutId = setTimeout(() => {
+      if (!isAdmin()) return;
+      const extend = confirm('로그인 만료가 2분 남았습니다. 연장하시겠습니까?');
+      if (extend) {
+        warnDismissedForLastActive = null;
+        setLastActive();
+        scheduleSessionTimers();
+        return;
+      }
+      warnDismissedForLastActive = getLastActive();
+    }, warnIn);
+  }
 
   logoutTimeoutId = setTimeout(() => {
     if (!isAdmin()) return;
