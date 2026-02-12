@@ -244,6 +244,8 @@ const scheduleTimeEl = document.querySelector('#schedule-time');
 const schedulePlaceEl = document.querySelector('#schedule-place');
 const scheduleOpponentEl = document.querySelector('#schedule-opponent');
 const photoForm = document.querySelector('#gallery-form');
+const photoDropZone = document.querySelector('#photo-drop-zone');
+const photoPreview = document.querySelector('#photo-preview');
 const photoList = document.querySelector('#gallery-list');
 const clearGalleryBtn = document.querySelector('#clear-gallery');
 const clearBtn = document.querySelector('#clear-members');
@@ -650,7 +652,131 @@ if (memberList) {
   });
 }
 
+const formatDateCaptionInput = (dateValue) => {
+  if (!dateValue) return '';
+  const [year, month, day] = dateValue.split('-');
+  if (!year || !month || !day) return '';
+  return `${year}년 ${month}월 ${day}일`;
+};
+
+const guessDateFromFilename = (name) => {
+  if (!name) return '';
+  const match = String(name).match(/(\d{4})[._-]?(\d{2})[._-]?(\d{2})/);
+  if (!match) return '';
+  const [, year, month, day] = match;
+  return `${year}-${month}-${day}`;
+};
+
+const setCaptionFromInputs = (dateInput, noteInput, captionInput) => {
+  if (!dateInput || !noteInput || !captionInput) return;
+  const dateText = formatDateCaptionInput(dateInput.value);
+  const note = String(noteInput.value || '').trim();
+  captionInput.value = dateText && note ? `${dateText} - ${note}` : '';
+};
+
+const updatePhotoPreview = (file) => {
+  if (!photoPreview) return;
+  if (!file) {
+    photoPreview.innerHTML = '';
+    photoPreview.classList.remove('active');
+    return;
+  }
+  const url = URL.createObjectURL(file);
+  photoPreview.innerHTML = `
+    <img src="${url}" alt="선택한 사진 미리보기" />
+    <div>
+      <strong>${file.name}</strong>
+      <div>${Math.round(file.size / 1024)} KB</div>
+    </div>
+  `;
+  photoPreview.classList.add('active');
+};
+
+const getExifDate = async (file) => {
+  if (!file || !window.exifr || typeof window.exifr.parse !== 'function') return null;
+  try {
+    const data = await window.exifr.parse(file, { pick: ['DateTimeOriginal', 'CreateDate'] });
+    const value = data?.DateTimeOriginal || data?.CreateDate;
+    if (value instanceof Date) return value;
+    if (typeof value === 'string') {
+      const parsed = new Date(value);
+      if (!Number.isNaN(parsed.getTime())) return parsed;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+};
+
+const applyDefaultDate = async (file, dateInput) => {
+  if (!file || !dateInput) return;
+  const exifDate = await getExifDate(file);
+  if (exifDate) {
+    const year = String(exifDate.getFullYear());
+    const month = String(exifDate.getMonth() + 1).padStart(2, '0');
+    const day = String(exifDate.getDate()).padStart(2, '0');
+    dateInput.value = `${year}-${month}-${day}`;
+    return;
+  }
+  let value = guessDateFromFilename(file.name);
+  if (!value && Number.isFinite(file.lastModified)) {
+    const date = new Date(file.lastModified);
+    const year = String(date.getFullYear());
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    value = `${year}-${month}-${day}`;
+  }
+  if (value) {
+    dateInput.value = value;
+  }
+};
+
 if (photoForm) {
+  const fileInput = photoForm.querySelector('input[name="photoFile"]');
+  const dateInput = photoForm.querySelector('input[name="photoDate"]');
+  const noteInput = photoForm.querySelector('input[name="photoNote"]');
+  const captionInput = photoForm.querySelector('input[name="caption"]');
+
+  if (fileInput && dateInput && noteInput && captionInput) {
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files && fileInput.files[0];
+      updatePhotoPreview(file || null);
+      if (file) {
+        await applyDefaultDate(file, dateInput);
+        setCaptionFromInputs(dateInput, noteInput, captionInput);
+      }
+    });
+
+    dateInput.addEventListener('input', () => {
+      setCaptionFromInputs(dateInput, noteInput, captionInput);
+    });
+
+    noteInput.addEventListener('input', () => {
+      setCaptionFromInputs(dateInput, noteInput, captionInput);
+    });
+  }
+
+  if (photoDropZone && fileInput) {
+    ['dragenter', 'dragover'].forEach((evt) => {
+      photoDropZone.addEventListener(evt, (event) => {
+        event.preventDefault();
+        photoDropZone.classList.add('dragover');
+      });
+    });
+    ['dragleave', 'drop'].forEach((evt) => {
+      photoDropZone.addEventListener(evt, (event) => {
+        event.preventDefault();
+        photoDropZone.classList.remove('dragover');
+      });
+    });
+    photoDropZone.addEventListener('drop', (event) => {
+      const files = event.dataTransfer?.files;
+      if (!files || !files.length) return;
+      fileInput.files = files;
+      fileInput.dispatchEvent(new Event('change'));
+    });
+  }
+
   photoForm.addEventListener('submit', (event) => {
     event.preventDefault();
     if (!isAdmin()) {
@@ -661,7 +787,7 @@ if (photoForm) {
     const file = form.get('photoFile');
     const caption = String(form.get('caption') || '').trim();
     if (!(file instanceof File) || file.size === 0 || !caption) {
-      alert('사진 파일과 캡션을 입력해 주세요.');
+      alert('사진 파일과 날짜/내용을 입력해 주세요.');
       return;
     }
     if (!file.type.startsWith('image/')) {
@@ -683,6 +809,8 @@ if (photoForm) {
       photos.unshift({ url, caption });
       savePhotos(photos);
       photoForm.reset();
+      updatePhotoPreview(null);
+      if (captionInput) captionInput.value = '';
       renderGalleryAdmin();
       renderGallery();
       setLastActive();

@@ -147,6 +147,56 @@ a {
   font-weight: 600;
 }
 
+.drop-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 2px dashed rgba(26, 26, 26, 0.2);
+  background: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.drop-zone input[type='file'] {
+  margin-top: 8px;
+}
+
+.drop-zone.dragover {
+  border-color: var(--primary);
+  background: rgba(13, 92, 61, 0.08);
+}
+
+.drop-title {
+  font-weight: 700;
+}
+
+.drop-sub {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.photo-preview {
+  display: none;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.photo-preview.active {
+  display: flex;
+}
+
+.photo-preview img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
 .hero {
   padding: 80px 0 60px;
 }

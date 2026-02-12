@@ -38,13 +38,23 @@
         </div>
         <div class="admin-grid admin-gallery">
           <form id="gallery-form" class="form-card" autocomplete="off">
-            <label>
-              사진 파일
+            <label class="drop-zone" id="photo-drop-zone">
+              <span class="drop-title">사진 드래그 또는 선택</span>
+              <span class="drop-sub">이미지 파일을 끌어 놓거나 클릭해서 선택하세요.</span>
               <input type="file" name="photoFile" accept="image/*" required />
             </label>
+            <div id="photo-preview" class="photo-preview" aria-live="polite"></div>
             <label>
-              캡션
-              <input type="text" name="caption" placeholder="간단한 설명" required />
+              날짜
+              <input type="date" name="photoDate" required />
+            </label>
+            <label>
+              사진 내용
+              <input type="text" name="photoNote" placeholder="예: 시무식 시상식 기념사진" required />
+            </label>
+            <label>
+              자동 캡션
+              <input type="text" name="caption" placeholder="YYYY년 MM월 DD일 - 사진 내용" readonly required />
             </label>
             <button class="btn primary" type="submit">사진 추가</button>
             <p class="form-hint">등록된 사진은 갤러리에 최대 16장까지 노출됩니다. (권장 2MB 이하)</p>
@@ -69,6 +79,7 @@
     </div>
   </footer>
 
+  <script src="https://unpkg.com/exifr/dist/lite.umd.js"></script>
   <script src="main.js?v=20260211" defer></script>
 </body>
 </html>
