@@ -219,6 +219,54 @@ const DEFAULT_GALLERY_CAPTIONS = {
   '20260125_100306.jpg': '훈련 후 간식 시간',
 };
 
+const DEFAULT_BLOG_POSTS = [
+  {
+    id: 'post-2026-01',
+    title: '2026년 새해 훈련 후 라면 파티',
+    date: '2026-01-25',
+    thumb: 'images/gallery/20260125_100051.jpg',
+    excerpt: '새해 첫 훈련을 마치고 함께하는 따뜻한 라면 파티! 추운 겨울에도 열정 넘치는 회원들의 현장을 소개합니다.',
+    content: '<p>2026년 새해 첫 훈련을 성공적으로 마쳤습니다!</p><p>영하의 날씨에도 불구하고 많은 회원들이 참석하여 열정적인 훈련을 펼쳤습니다. 조리체육공원의 싸늘한 공기를 가르며 함께 뛰는 것만으로도 충분히 즐거운 시간이었습니다.</p><p>훈련 후에는 회원들이 직접 준비한 라면을 함께 끓여 나누는 뒤풀이가 이어졌습니다. 추운 날씨에 땀 흘리고 먹는 따뜻한 라면 한 그릇의 맛은 정말 이루 말할 수 없었습니다.</p><p>새해에도 건강하게 함께 뛸 수 있어서 행복합니다. 2026년 한 해도 후곡생활축구회와 함께 좋은 추억 많이 만들어봐요!</p>',
+    tags: ['훈련', '뒤풀이', '2026'],
+  },
+  {
+    id: 'post-2025-11',
+    title: '2025 가을 시즌 뒤풀이',
+    date: '2025-11-02',
+    thumb: 'images/gallery/20251102_191315.jpg',
+    excerpt: '2025년 가을 시즌을 마치며 회원들과 함께한 즐거운 뒤풀이 현장을 소개합니다.',
+    content: '<p>2025년 가을 시즌을 마무리하며 회원들과 함께 즐거운 뒤풀이를 가졌습니다.</p><p>올 한 해도 함께 뛰어준 모든 회원분들께 진심으로 감사드립니다. 승패를 떠나 함께 땀 흘리고, 함께 웃으며 쌓은 추억들이 무엇보다 소중합니다.</p><p>가을의 선선한 날씨만큼이나 기분 좋은 자리였습니다. 맛있는 음식과 시원한 음료를 나누며 서로의 안부를 묻고 이야기꽃을 피웠습니다.</p><p>겨울에도 건강하게 운동하며 2026년 시즌을 기대해봐요! 후곡 파이팅!</p>',
+    tags: ['뒤풀이', '2025', '가을'],
+  },
+  {
+    id: 'post-2025-06',
+    title: '여름 친목 식사 모임',
+    date: '2025-06-08',
+    thumb: 'images/gallery/20250608_162605.jpg',
+    excerpt: '6월의 따뜻한 날, 회원들과 함께한 친목 식사 모임 소식을 전합니다.',
+    content: '<p>6월의 따사로운 날씨를 맞아 회원들과 함께 친목 식사 모임을 가졌습니다.</p><p>운동만큼이나 중요한 것이 바로 이런 친목의 시간이 아닐까요? 맛있는 음식과 함께 도란도란 이야기를 나누며 서로를 더 잘 알아가는 소중한 자리였습니다.</p><p>처음 참가하신 신규 회원분들도 함께해 주셔서 더욱 즐거웠습니다. 자리를 빛내주신 모든 분들께 감사드립니다.</p><p>앞으로도 이런 모임을 꾸준히 가져서 더욱 돈독한 팀워크를 쌓아나가겠습니다!</p>',
+    tags: ['친목', '식사', '2025'],
+  },
+  {
+    id: 'post-2025-02',
+    title: '2025 동계 단체사진',
+    date: '2025-02-02',
+    thumb: 'images/gallery/20250202_084850.jpg',
+    excerpt: '추운 겨울에도 함께 모인 후곡생활축구회 회원들의 열정적인 모습을 담았습니다.',
+    content: '<p>한겨울의 추위도 후곡생활축구회 회원들의 열정을 막을 수는 없습니다!</p><p>2025년 겨울, 영하의 날씨에도 불구하고 많은 회원들이 참석하여 훈련을 진행했습니다. 추운 날씨에 몸을 움직이면 오히려 더욱 활력이 넘치는 것 같습니다.</p><p>훈련을 마치고 다 같이 단체사진을 찍었습니다. 추위에 빨개진 볼이지만 활짝 웃는 얼굴들이 너무 보기 좋습니다.</p><p>함께 해주신 모든 회원분들께 감사드리며, 건강한 몸과 마음으로 한 해를 열어나가겠습니다!</p>',
+    tags: ['동계', '단체사진', '2025'],
+  },
+  {
+    id: 'post-2025-01',
+    title: '시무식 및 시상식',
+    date: '2025-01-01',
+    thumb: 'images/gallery/1770724491236.jpg',
+    excerpt: '새해를 맞아 진행된 시무식과 시상식 현장을 소개합니다. 수고한 회원들을 격려하며 새 출발을 다짐했습니다.',
+    content: '<p>새해를 맞아 후곡생활축구회 시무식 및 시상식이 성황리에 개최되었습니다.</p><p>지난 한 해 동안 꾸준히 참여해주신 모든 회원분들께 진심으로 감사의 말씀을 전합니다. 시상식에서는 성실하게 참여한 우수 회원들에게 감사패와 상품을 증정하였습니다.</p><p>매번 주말이면 함께 땀 흘리며 만든 추억들이 우리 클럽의 가장 큰 자산입니다. 새해에도 건강하게 함께 뛰며 즐거운 시간 만들어봐요!</p><p>후곡생활축구회 파이팅! 🔥</p>',
+    tags: ['시무식', '시상식', '2025'],
+  },
+];
+
 const DEFAULT_PHOTOS = DEFAULT_GALLERY_FILES.map((file) => {
   const dateCaption = formatDateCaption(file);
   const detail = DEFAULT_GALLERY_CAPTIONS[file];
@@ -228,6 +276,10 @@ const DEFAULT_PHOTOS = DEFAULT_GALLERY_FILES.map((file) => {
     caption: detail ? `${dateCaption} - ${detail}` : dateCaption,
   };
 });
+
+const blogHomeGrid = document.querySelector('#blog-home-grid');
+const blogListGrid = document.querySelector('#blog-list-grid');
+const blogPostContent = document.querySelector('#blog-post-content');
 
 const loginForm = document.querySelector('#admin-login-form');
 const memberForm = document.querySelector('#member-form');
@@ -480,6 +532,71 @@ const renderGallery = () => {
   });
   renderGalleryPagination(items.length);
   updateGalleryMore(items.length);
+};
+
+const formatBlogDate = (dateStr) => {
+  if (!dateStr) return '';
+  const [year, month, day] = dateStr.split('-');
+  return `${year}년 ${month}월 ${day}일`;
+};
+
+const makeBlogCardHTML = (post) => `
+  <img class="blog-card-thumb" src="${post.thumb}" alt="${post.title}" loading="lazy" />
+  <div class="blog-card-body">
+    <p class="blog-card-date">${formatBlogDate(post.date)}</p>
+    <h3 class="blog-card-title">${post.title}</h3>
+    <p class="blog-card-excerpt">${post.excerpt}</p>
+    <div class="blog-card-tags">${post.tags.map((t) => `<span class="blog-tag">${t}</span>`).join('')}</div>
+  </div>
+`;
+
+const renderHomeBlog = () => {
+  if (!blogHomeGrid) return;
+  const posts = DEFAULT_BLOG_POSTS.slice(0, 4);
+  blogHomeGrid.innerHTML = '';
+  posts.forEach((post) => {
+    const card = document.createElement('a');
+    card.className = 'blog-card';
+    card.href = `blog-post.html?id=${post.id}`;
+    card.innerHTML = makeBlogCardHTML(post);
+    blogHomeGrid.appendChild(card);
+  });
+};
+
+const renderBlogList = () => {
+  if (!blogListGrid) return;
+  blogListGrid.innerHTML = '';
+  DEFAULT_BLOG_POSTS.forEach((post) => {
+    const card = document.createElement('a');
+    card.className = 'blog-card';
+    card.href = `blog-post.html?id=${post.id}`;
+    card.innerHTML = makeBlogCardHTML(post);
+    blogListGrid.appendChild(card);
+  });
+};
+
+const renderBlogPost = () => {
+  if (!blogPostContent) return;
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  const post = DEFAULT_BLOG_POSTS.find((p) => p.id === id);
+  if (!post) {
+    blogPostContent.innerHTML = '<p>게시글을 찾을 수 없습니다. <a href="blog.html">블로그 목록으로 돌아가기</a></p>';
+    return;
+  }
+  document.title = `${post.title} | 후곡생활축구회`;
+  blogPostContent.innerHTML = `
+    <img class="blog-post-hero" src="${post.thumb}" alt="${post.title}" />
+    <div class="blog-post-header">
+      <div class="blog-card-tags" style="margin-bottom:12px">${post.tags.map((t) => `<span class="blog-tag">${t}</span>`).join('')}</div>
+      <h1 class="blog-post-title">${post.title}</h1>
+      <div class="blog-post-meta"><span>${formatBlogDate(post.date)}</span></div>
+    </div>
+    <div class="blog-post-content">${post.content}</div>
+    <div class="blog-post-nav">
+      <a class="btn ghost blog-back" href="blog.html">← 블로그 목록으로</a>
+    </div>
+  `;
 };
 
 const renderGalleryAdmin = () => {
@@ -938,6 +1055,9 @@ updateAdminUI();
 renderMembers();
 renderGallery();
 renderGalleryAdmin();
+renderHomeBlog();
+renderBlogList();
+renderBlogPost();
 fetchWeeklySchedule();
 guardAdminNavLinks();
 enforceAdminAccess();
